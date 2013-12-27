@@ -70,11 +70,17 @@ if install "anki mecab mplayer" "Anki"; then
 fi
 install "goldendict" "Goldendict" 
 install "wine mesa-utils" "Wine"
-install "ibus-mozc" "Google Japanese IME" 
-if install "gtk-redshift" "Redshift"; then
+install "ibus-mozc" "Google Japanese IME"
+if install "gtk-redshift redshift" "Redshift"; then
     install "geoclue geoclue-hostip" "Geoclue"
     if [ -e "./setup_redshift.sh" ]; then
         bash ./setup_redshift.sh
+    fi
+elif available "fluxgui"; then
+    install "fluxgui" "F.lux (redshift is based off this)"
+else
+    if prompt "Install F.lux"; then
+        bash ./setup_flux.sh
     fi
 fi
 install "dia" "DIA"
@@ -83,6 +89,7 @@ install "cpufrequtils" "cpufrequtils"
 install "gimp" "gimp image editor"
 install "scrot" "scrot"
 install "vlc" "vlc"
+install "ubuntu-restricted-extras"
 if available "skype"; then
     install "skype" "Skype"
 else
