@@ -16,8 +16,6 @@ export TOINSTALLFILE
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR"
 
-DROPBOX_LINUXCONFIG=`cat dropbox_linux_config.txt`
-export DROPBOX_LINUXCONFIG
 PROMPT_FORCE_ANSWER=""
 export PROMPT_FORCE_ANSWER
 
@@ -77,6 +75,8 @@ resolve_symlink () {
             RESOLVED_SYMLINK="$FILE"
         fi
         return "$retval"
+    else
+        RESOLVED_SYMLINK="$FILE"
     fi
 }
 export -f resolve_symlink
@@ -189,6 +189,7 @@ create_link_from_to() {
 
     RENAME=true
     ALREADY_LINKED=false
+
     if ! file_exists_or_print_error "$LINK_DESCRIPTION" "$LINK_TO"; then
         return 1
     else

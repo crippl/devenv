@@ -7,7 +7,7 @@
 # If nothing is found, will try to git clone `cat gitrepo.txt`
 #
 
-AWESOME_CONFIG=`echo ~/.config/awesome_`
+AWESOME_CONFIG=`echo ~/.config/awesome`
 AWESOME_CONFIG_LOCAL=`pwd`/awesomegit
 AWESOME_GIT_REPO_FILE="gitrepo.txt"
 AWESOME_CONFIG_GIT_REPO=`cat "$AWESOME_GIT_REPO_FILE" 2> /dev/null`
