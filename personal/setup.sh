@@ -91,9 +91,5 @@ else
         firefox "$URL" 2>&1 > /dev/null&
     fi
 fi
-    
-if install "awesome awesome-extra" "AwesomeWM"; then
-    bash ./setup_awesome.sh
-fi
 
 

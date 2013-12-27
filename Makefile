@@ -8,7 +8,7 @@ no_targets__:
 list:
 	@grep '^[^#[:space:]].*:' Makefile | grep -Ev 'no_targets__:|list:'
 
-all: clear personal development editors install
+all: clear personal awesome development editors install
 
 clean:
 	@bash ./setup.sh clean
