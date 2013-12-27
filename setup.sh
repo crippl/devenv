@@ -16,6 +16,9 @@ export TOINSTALLFILE
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR"
 
+APT_CACHE_SLOW=false
+export APT_CACHE_SLOW
+
 PROMPT_FORCE_ANSWER=""
 export PROMPT_FORCE_ANSWER
 
@@ -404,7 +407,13 @@ installed() {
 
     # Checks apt-cache policy for Installed: (none)
     if available "$1"; then
+        START=$(date +%s)
         tmp=`apt-cache policy "$1" | grep Installed: | grep "none"`
+        END=$(date +%s)
+        DIFF=$(( $END - $START ))
+        if [ "$DIFF" -ge 2 ]; then # running slow... should run apt-get autoclean
+            APT_CACHE_SLOW=true
+        fi
         return `[ -z "$tmp" ]`
     else
         return 1
@@ -434,6 +443,9 @@ install() {
     toinstall=""
     installed=""
     notavailable=""
+    if [ "$APT_CACHE_SLOW" == true ]; then
+        echo "> Checking if installed: $DESCRIPTION"
+    fi
     for x in $array
     do
         # check if this is already installed
@@ -442,7 +454,7 @@ install() {
                 echo ">> **Already installing $x, skipping"
             else
                 if available "$x"; then
-                    toinstall="$toinstall $x"
+                    toinstall="$x $toinstall"
                 else
                     if ! already_in_file "$MISSINGPACKAGES" "$x"; then
                         echo -n "$x " >> "$MISSINGPACKAGES"
@@ -451,23 +463,27 @@ install() {
                 fi
             fi
         else
-            installed="$installed $x"
+            installed="$x $installed"
         fi
     done
 
     if [ -z "$toinstall" ] && [ -z "$installed" ] && [ -n "$notavailable" ]; then
         # nothing to install, nothing installed, things not available; problem
         echo "> Cannot Install   : $DESCRIPTION" >&2
-        echo ">> Missing  :$notavailable" >&2
+        echo ">> Missing  : $notavailable" >&2
         return 1
     elif [ -z "$toinstall" ] && [ -n "$notavailable" ]; then
         # nothing to install, things unavailable to install
         echo "> Installed kindof : $DESCRIPTION" >&2
-        echo ">> Installed:$installed"
-        echo ">> Missing  :$notavailable" >&2
+        echo ">> Installed: $installed"
+        echo ">> Missing  : $notavailable" >&2
     elif [ -n "$toinstall" ]; then
         # things to install
         #echo "> Installing $DESCRIPTION"
+        if [ "$DESCRIPTION" == "$PACKAGES" ]; then
+            # Description was not given, don't show all packages to install, just those that can be installed
+            DESCRIPTION="$toinstall"
+        fi
         if prompt "> Install $DESCRIPTION"; then
             if [ -n "$notavailable" ]; then
                 if ! prompt "> Notice: the following packages are not available \"$notavailable\"... continue"; then
@@ -607,6 +623,9 @@ else
         if [ -f "./$1/setup.sh" ]; then
             cd "$1"
             bash ./setup.sh
+            if "$APT_CACHE_SLOW"; then
+                echo "> 'apt-cache policy' command seemed to run slow, you can try running 'sudo apt-get autoclean' to fix this"
+            fi
             exit 0
         else
             echo "> File does not exist $DIR/$1/setup.sh"

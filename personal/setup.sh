@@ -80,8 +80,9 @@ fi
 install "dia" "DIA"
 install "jupiter" "Jupiter power daemon"
 install "cpufrequtils" "cpufrequtils"
-install "gimp" "The Gimp"
+install "gimp" "gimp image editor"
 install "scrot" "scrot"
+install "vlc" "vlc"
 if available "skype"; then
     install "skype" "Skype"
 else
