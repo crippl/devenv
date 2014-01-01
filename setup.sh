@@ -308,7 +308,7 @@ runnable() {
     # $1: Command to check if runnable
     # Returns: success/failure
     # Checks if the specified command is runnable in the current path
-    hash dropbox 2>/dev/null
+    hash "$1" 2>/dev/null
     return $?
 }
 export -f runnable
@@ -321,7 +321,7 @@ git_clone_and_submodule_init_update() {
     # Returns: Success on successfull clone
     # REPO_DIRECTORY: Directory of cloned repo
     REPO_DIRECTORY=""
-    if ! require_command "git" "git"; then
+    if ! require_package "git"; then
         return 1
     fi
     if git clone "$1"; then
@@ -538,20 +538,20 @@ install_now() {
 }
 export -f install_now
 
-require_command() {
-    # $1: Command to try to run
-    # $2: Package to install if not available
-
-    if ! available "$1"; then
-        if ! install_now "$2" "$2"; then
+require_package() {
+    # $1: Package to install if not installed
+    if ! installed "$1"; then
+        if ! install_now "$1" "$1"; then
             return 1
         else
-            available "$1"
+            installed "$1"
             return $?
         fi
+    else
+        return 0
     fi
 }
-export -f require_command
+export -f require_package
 
 ####################################################
 #                End of functions                  #

@@ -35,7 +35,7 @@ install_dropbox() {
             return 0
         fi
     else
-        echo ">> *Dropbox already installed"
+        echo "> Installed Already: Dropbox"
     fi
 }
 
@@ -56,7 +56,69 @@ start_dropbox() {
             return 1
         fi
     else
-        echo ">> *Dropbox already running"
+        echo "> Already Running: Dropbox"
+    fi
+}
+
+install_rescuetime() {
+    # Downloads rescuetime
+    # Returns: success/failure
+
+    echo "> Installing Rescuetime"
+    if `hash rescuetime`; then
+        echo yep
+    else
+        echo nope
+    fi
+    if ! runnable rescuetime; then
+        if prompt "> Install Rescuetime"; then
+	    MACHINE_TYPE=`uname -m`
+            if [ ! -e `echo ~/rescuetime.deb` ] || ! prompt "> ~/rescuetime.deb already exists, install that"; then
+	        if [ ${MACHINE_TYPE} == 'x86_64' ]; then
+		    # 64-bit stuff here
+	            RESCUETIMEURL="https://www.rescuetime.com/installers/rescuetime_current_amd64.deb"
+                    # https://www.rescuetime.com/installers/rescuetime_current_amd64.rpm
+	        else
+		    # 32-bit stuff here
+                    RESCUETIMEURL="https://www.rescuetime.com/installers/rescuetime_current_i386.deb"
+                    # https://www.rescuetime.com/installers/rescuetime_current_i386.rpm
+	        fi
+                if [ -n "$RESCUETIMEURL" ]; then
+                    while true; do
+                        if cd ~ && wget -O - "$RESCUETIMEURL" > rescuetime.deb; then
+                            cd -
+                            break;
+                        else
+                            if ! prompt "> Try downloading again"; then
+                                break;
+                            fi
+                        fi
+                    done
+                fi
+            fi
+            if [ -e `echo ~/rescuetime.deb` ]; then
+                while true; do
+                    require_package "gtk2-engines-pixbuf"
+                    if sudo dpkg -i `echo ~/rescuetime.deb`; then
+                        break;
+                    else
+                        if ! prompt "> Try installing again"; then
+                            return 1
+                            break;
+                        fi
+                    fi
+                done
+            else
+                echo "> Cannot find rescuetime.deb"
+                return 1
+            fi
+            return 0
+        else
+            echo "> Skipping....";
+            return 0
+        fi
+    else
+        echo "> Installed Already: Rescuetime"
     fi
 }
 
@@ -64,6 +126,8 @@ if install_dropbox; then
     start_dropbox
 fi
 install "nautilus-dropbox" "Dropbox nautilus support"
+
+install_rescuetime
 
 if install "anki mecab mplayer" "Anki"; then
     install "dvipng" "Anki Latex support"

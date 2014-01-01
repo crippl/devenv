@@ -41,7 +41,7 @@ if [ -d "$AWESOME_CONFIG_LOCAL" ]; then
     if [ -z "$directories" ]; then
         if [ -n "$AWESOME_CONFIG_GIT_REPO" ]; then
             if prompt "> No local Awesomewm config git repo, clone $AWESOME_CONFIG_GIT_REPO"; then
-                if ! require_command "git" "git"; then
+                if ! require_package "git"; then
                     CONFIGURE_AWESOME=false
                 else
                     cd "$AWESOME_CONFIG_LOCAL"
@@ -59,7 +59,7 @@ if [ -d "$AWESOME_CONFIG_LOCAL" ]; then
             fi
         else
             if prompt "> No git repo given in config file $AWESOME_GIT_REPO_FILE and no config available, type one"; then
-                if require_command "git" "git"; then
+                if require_package "git"; then
                     cd "$AWESOME_CONFIG_LOCAL"
                     while true; do
                         read -p "> git repo: " repo
@@ -96,7 +96,7 @@ if [ -d "$AWESOME_CONFIG_LOCAL" ]; then
                 if [ -d "$AWESOME_CONFIG_LOCAL/.git" ]; then
                     if prompt ">> Directory $AWESOME_CONFIG_LOCAL is a git repo, pull and rebase"; then
                         cd "$AWESOME_CONFIG_LOCAL"
-                        if require_command "git" "git"; then
+                        if require_package "git"; then
                             git pull && git rebase
                         fi
                     fi
