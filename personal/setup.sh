@@ -65,11 +65,6 @@ install_rescuetime() {
     # Returns: success/failure
 
     echo "> Installing Rescuetime"
-    if `hash rescuetime`; then
-        echo yep
-    else
-        echo nope
-    fi
     if ! runnable rescuetime; then
         if prompt "> Install Rescuetime"; then
 	    MACHINE_TYPE=`uname -m`
