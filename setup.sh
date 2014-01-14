@@ -49,6 +49,23 @@ prompt() {
 }
 export -f prompt
 
+DIRECTORY=""
+input_valid_directory() {
+    while true; do
+        read -p "$1 ?: " USER_DIRECTORY
+        if [ -d "$USER_DIRECTORY" ]; then
+            DIRECTORY="$USER_DIRECTORY"
+            return 0
+        else
+            if ! prompt "> $USER_DIRECTORY doesn't exist, input again"; then
+                return 1
+            fi
+        fi
+    done
+}
+export -f input_valid_directory
+export DIRECTORY
+
 ignore() {
     # Prompts user to ignore an error
     # Returns: 0 for yes, 1 for no
@@ -557,6 +574,67 @@ require_package() {
     fi
 }
 export -f require_package
+
+ABSOLUTE_PATH=""
+absolute_path_of_file() {
+    # $1: Path of file to get absolute path of
+    # Returns: ABSOLUTE_PATH
+    ABSOLUTE_PATH=`echo $(cd $(dirname "$1"); pwd)/$(basename "$1")`
+    if [ -e "$ABSOLUTE_PATH" ]; then
+        return 0
+    else
+        return 1
+    fi
+}
+export -f absolute_path_of_file
+export ABSOLUTE_PATH
+
+URL_FILENAME=""
+extract_url_filename() {
+    # $1: URL To get filename of
+    # Returns: URL_FILENAME
+    AFTER_SLASH=${1##*/}
+    URL_FILENAME=`echo "${AFTER_SLASH%%\?*}"`
+}
+export -f extract_url_filename
+export URL_FILENAME
+
+USERREQUESTED_FOLDER=""
+USERREQUESTED_FOLDER_FILE_ABSPATH=""
+ask_user_where_to_extract_file_at() {
+    # $1: local path to file
+    # $2: Description of file
+    # Returns: USERREQUESTED_FOLDER
+    #          USERREQUESTED_FOLDER_FILE_ABSPATH
+    LOCALFILE="$1"
+    DESCRIPTION="$2"
+    if [ -z "$DESCRIPTION" ]; then
+        DESCRIPTION="$LOCALFILE"
+    fi
+
+    if [ -e "$LOCALFILE" ]; then
+        if ! absolute_path_of_file "$LOCALFILE"; then
+            echo "> Cannot get absolute path of file $LOCALFILE, failing"
+            return 1
+        fi
+        USERREQUESTED_FOLDER_FILE_ABSPATH="$ABSOLUTE_PATH"
+        if input_valid_directory "> Where do you want to install $DESCRIPTION to"; then
+            USERREQUESTED_FOLDER="$DIRECTORY"
+        else
+            if ! prompt "> Install instead to your home folder"; then
+                return 1
+            else
+                USERREQUESTED_FOLDER=`echo ~`
+            fi
+        fi
+    else
+        echo "> Cannot find file $LOCALFILE"
+        return 1
+    fi
+    return 0
+}
+export -f ask_user_where_to_extract_file_at
+export DOWNLOADEDFILE_ABSPATH
 
 ####################################################
 #                End of functions                  #

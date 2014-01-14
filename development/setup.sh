@@ -21,3 +21,7 @@ install "netbeans maven" "Java tools"
 if [ -e "./setup_jdk6.sh" ] && prompt "> Download and install jdk6"; then
     bash ./setup_jdk6.sh
 fi
+
+if [ -e "./setup_android_sdk.sh" ] && prompt "> Download and install Android SDK"; then
+    bash ./setup_android_sdk.sh
+fi

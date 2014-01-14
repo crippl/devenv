@@ -95,8 +95,8 @@ fi
 
 # get filename to be downloaded
 # from http://stackoverflow.com/questions/1199613/extract-filename-and-path-from-url-in-bash-script
-AFTER_SLASH=${JDKURL##*/}
-JDKFILE=`echo "${AFTER_SLASH%%\?*}"`
+extract_url_filename "$JDKURL"
+JDKFILE="$URL_FILENAME"
 DOWNLOAD=true
 while true; do
     if [ -e "$JDKFILE" ] && prompt "> $JDKFILE exists, install that"; then
@@ -106,24 +106,13 @@ while true; do
         wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F" "$JDKURL"
     fi
 
-    if [ -e "$JDKFILE" ]; then
-        if ! absolute_path_of_file "$JDKFILE"; then
-            echo "> Cannot get absolute path of file $JDKFILE, failing"
-            return 1
-        fi
-        JDKABSOLUTEPATH="$ABSOLUTE_PATH"
-        if input_valid_directory "> Where do you want to install the jdk to"; then
-            cd "$DIRECTORY"
-        else
-            echo "> Installing to your home folder"
-            cd ~
-        fi
-        if [ ! -x "$JDKABSOLUTEPATH" ]; then
-            chmod u+x "$JDKABSOULTEPATH"
-        fi
+    if ask_user_where_to_extract_file_at "$JDKFILE" "JDK6"; then
+        cd "$USERREQUESTED_FOLDER"
+        JDKABSOLUTEPATH="$USERREQUESTED_FOLDER_FILE_ABSPATH"
         while true; do
             echo "Running: '$JDKABSOLUTEPATH'"
             if "$JDKABSOLUTEPATH"; then
+                echo "> Installed JDK6"
                 break; #success
             else
                 if ! prompt "> Failed to install $JDKFILE from $JDKURL, try again"; then

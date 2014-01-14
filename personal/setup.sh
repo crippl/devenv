@@ -149,6 +149,7 @@ install "gimp" "gimp image editor"
 install "scrot" "scrot"
 install "vlc" "vlc"
 install "ubuntu-restricted-extras"
+install "gnome-system-tools"
 if available "skype"; then
     install "skype" "Skype"
 else
