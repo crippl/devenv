@@ -5,6 +5,11 @@
 
 #set -x
 
+if ! `hash apt-get` || ! `hash apt-cache`; then
+    echo "This script only runs on debian and uses apt-get & apt-cache"
+    exit 1
+fi
+
 # File containing everything to install with one command
 # apt-get install `cat "$TOINSTALLFILE"`
 TOINSTALLFILE=`echo ~/.to_install`
@@ -52,7 +57,7 @@ ignore() {
 }
 export -f ignore
 
-RESOLVED_SYMLINK=echo
+RESOLVED_SYMLINK=""
 export RESOLVED_SYMLINK
 
 resolve_symlink () {

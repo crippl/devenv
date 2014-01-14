@@ -7,6 +7,7 @@
 if install "git git-svn" "git/svn"; then
 #    if prompt "> Configure GIT"; then
         bash ./setup_git.sh
+        install "meld"
 #    fi
 fi
 install "htop iotop" "System tools"
@@ -17,3 +18,6 @@ if install "build-essential glibc-doc valgrind manpages-dev gdb cgdb autoconf au
 fi
 install "sqlite3 libsqlite3-dev sqlite3-doc sqlitebrowser sqliteman sqliteman-doc" "sqlite3"
 install "netbeans maven" "Java tools"
+if [ -e "./setup_jdk6.sh" ] && prompt "> Download and install jdk6"; then
+    bash ./setup_jdk6.sh
+fi
