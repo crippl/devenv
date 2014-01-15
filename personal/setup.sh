@@ -163,7 +163,7 @@ else
     fi
 fi
 
-if !available "steam"; then
+if available "steam"; then
     install "steam"
 else
     if prompt "> Download and install steam"; then
