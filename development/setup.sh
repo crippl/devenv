@@ -10,7 +10,7 @@ if install "git git-svn" "git/svn"; then
         install "meld"
 #    fi
 fi
-install "htop iotop" "System tools"
+install "htop iotop"
 if install "build-essential glibc-doc valgrind manpages-dev gdb cgdb autoconf autopoint manpages-posix-dev exuberant-ctags libgcc1-dbg libstdc++6-4.6-dbg bless" "C++ tools"; then
     install "lsb" "Linux Standard Base"
     install "eclipse eclipse-cdt eclipse-cdt-perf eclipse-cdt-profiling-framework eclipse-cdt-valgrind" "Eclipse"

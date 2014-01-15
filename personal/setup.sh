@@ -124,6 +124,9 @@ install "nautilus-dropbox" "Dropbox nautilus support"
 
 install_rescuetime
 
+install "chromium-browser" "Chromium Browser"
+install "firefox"
+
 if install "anki mecab mplayer" "Anki"; then
     install "dvipng" "Anki Latex support"
 fi
