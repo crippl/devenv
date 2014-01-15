@@ -5,10 +5,9 @@
 #
 
 if install "git git-svn" "git/svn"; then
-#    if prompt "> Configure GIT"; then
-        bash ./setup_git.sh
-        install "meld"
-#    fi
+    install "gitg" "gitg"
+    bash ./setup_git.sh
+    install "meld"
 fi
 install "htop iotop"
 if install "build-essential glibc-doc valgrind manpages-dev gdb cgdb autoconf autopoint manpages-posix-dev exuberant-ctags libgcc1-dbg libstdc++6-4.6-dbg bless" "C++ tools"; then
