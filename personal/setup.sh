@@ -174,6 +174,10 @@ else
             if wget "$STEAMURL"; then
                 install_deb_file "$STEAMFILENAME"
                 break
+            else
+                if ! prompt "> Try downloading $STEAMURL again"; then
+                    break
+                fi
             fi
         done
     fi
