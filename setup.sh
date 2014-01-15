@@ -634,7 +634,76 @@ ask_user_where_to_extract_file_at() {
     return 0
 }
 export -f ask_user_where_to_extract_file_at
-export DOWNLOADEDFILE_ABSPATH
+export USERREQUESTED_FOLDER
+export USERREQUESTED_FOLDER_FILE_ABSPATH
+
+install_deb_file_with_gdebi() {
+    # $1: .deb file to install
+    # Returns; If it installed sucessfully
+
+    DEBFILE="$1"
+    if runnable gdebi; then
+        while true; do
+            if ! sudo gdebi "$DEBFILE"; then
+                if ! prompt "> Try installing $DEBFILE again"; then
+                    return 1
+                fi
+            else
+                return 0
+            fi
+        done
+    fi
+    return 1
+}
+export -f install_deb_file_with_gdebi
+
+install_deb_file_with_dkpg() {
+    # $1: .deb file to install
+    # Returns; If it installed sucessfully
+
+    DEBFILE="$1"
+    if runnable dpkg; then
+        while true; do
+            if ! sudo dpkg "$DEBFILE"; then
+                if ! prompt "> Try installing $DEBFILE again"; then
+                    return 1
+                fi
+            else
+                return 0
+            fi
+        done
+    fi
+    return 1
+}
+export -f install_deb_file_with_dkpg
+
+install_deb_file() {
+    # $1: .deb file to install
+    # Returns: If it installed successfully
+    DEBFILE="$1"
+    
+    if [ ! -e "$DEBFILE" ]; then
+        echo "> Failed to install $DEBFILE, file does not exist"
+        return 1
+    fi
+    if runnable gdebi; then
+        install_deb_file_with_gdebi "$DEBFILE"
+        return $?
+    else
+        if ! install_deb_file_with_dkpg "$DEBFILE"; then
+            if available gdebi; then
+                if prompt "> Install this package with gdebi (resolves dependencies)"; then
+                    if require_package gdebi; then
+                        install_deb_file_with_gdebi "$DEBFILE"
+                        return !?
+                    fi
+                fi
+            fi
+        fi
+    fi
+    return 1
+}
+export -f install_deb_file
 
 ####################################################
 #                End of functions                  #

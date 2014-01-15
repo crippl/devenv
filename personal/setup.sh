@@ -94,7 +94,7 @@ install_rescuetime() {
             if [ -e `echo ~/rescuetime.deb` ]; then
                 while true; do
                     require_package "gtk2-engines-pixbuf"
-                    if sudo dpkg -i `echo ~/rescuetime.deb`; then
+                    if install_deb_file `echo ~/rescuetime.deb`; then
                         break;
                     else
                         if ! prompt "> Try installing again"; then
@@ -163,4 +163,18 @@ else
     fi
 fi
 
-
+if !available "steam"; then
+    install "steam"
+else
+    if prompt "> Download and install steam"; then
+        STEAMURL="http://media.steampowered.com/client/installer/steam.deb"
+        extract_url_filename "$STEAMURL"
+        STEAMFILENAME="$URL_FILENAME"
+        while true; do
+            if wget "$STEAMURL"; then
+                install_deb_file "$STEAMFILENAME"
+                break
+            fi
+        done
+    fi
+fi
