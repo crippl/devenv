@@ -2,13 +2,13 @@
 # Makefile to setup personal linux environment
 #
 
-no_targets__:
+#no_targets__:
 .PHONY: all personal dev development editors awesome
+
+all: clear personal awesome development editors install
 
 list:
 	@grep '^[^#[:space:]].*:' Makefile | grep -Ev 'no_targets__:|list:'
-
-all: clear personal awesome development editors install
 
 clean:
 	@bash ./setup.sh clean
