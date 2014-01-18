@@ -117,6 +117,13 @@ install_rescuetime() {
     fi
 }
 
+install_calibre_ebook_managment()
+{
+    # http://calibre-ebook.com/download_linux
+    echo "> Installing Calibre ebook manager"
+    sudo python -c "import sys; py3 = sys.version_info[0] > 2; u = __import__('urllib.request' if py3 else 'urllib', fromlist=1); exec(u.urlopen('http://status.calibre-ebook.com/linux_installer').read()); main()"
+}
+
 if install_dropbox; then
     start_dropbox
 fi
@@ -182,3 +189,12 @@ else
         done
     fi
 fi
+
+if ! runnable "calibre"; then
+    if prompt "> Install Calibre ebook manager (can export to kindle etc)"; then
+        install_calibre_ebook_managment
+    fi
+else
+    echo "> Installed Already: calibre"
+fi
+
