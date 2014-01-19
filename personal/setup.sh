@@ -121,7 +121,11 @@ install_calibre_ebook_managment()
 {
     # http://calibre-ebook.com/download_linux
     echo "> Installing Calibre ebook manager"
-    sudo python -c "import sys; py3 = sys.version_info[0] > 2; u = __import__('urllib.request' if py3 else 'urllib', fromlist=1); exec(u.urlopen('http://status.calibre-ebook.com/linux_installer').read()); main()"
+    if require_package "python"; then
+        sudo python -c "import sys; py3 = sys.version_info[0] > 2; u = __import__('urllib.request' if py3 else 'urllib', fromlist=1); exec(u.urlopen('http://status.calibre-ebook.com/linux_installer').read()); main()"
+    else
+        echo "> Failed to install Calibre"
+    fi
 }
 
 if install_dropbox; then
@@ -196,5 +200,22 @@ if ! runnable "calibre"; then
     fi
 else
     echo "> Installed Already: calibre"
+fi
+
+SOUNDCLOUDDL_REPO="https://github.com/lukapusic/soundcloud-dl"
+SOUNDCLOUDDL_DESC="Soundcloud-dl script by lukapusic"
+if ! runnable "soundcloud-dl.sh" && git_clone_prompt "$SOUNDCLOUDDL_REPO" "Install $SOUNDCLOUDDL_DESC"; then
+    if [ -e "$REPO_DIRECTORY/soundcloud-dl.sh" ]; then
+        if [ ! -d `echo ~/bin` ]; then
+            mkdir `echo ~/bin`
+        fi
+        SCRIPT="$REPO_DIRECTORY/soundcloud-dl.sh"
+        if [ ! -x "$SCRIPT" ]; then
+            chmod u+x "$SCRIPT"
+        fi
+        create_link_from_to "$SCRIPT" `echo ~/bin/soundcloud-dl.sh` "soundcloud-dl.sh script" "Make a link of soundcloud-dl.sh to ~/bin"
+    fi
+else
+    echo "> Installed Already: $SOUNDCLOUDDL_DESC"
 fi
 

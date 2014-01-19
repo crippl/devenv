@@ -275,15 +275,19 @@ create_link_from_to() {
 export -f create_link_from_to
 
 create_link_from_to_exit_on_fail() {
-    # $1-$4: See create_link_from_to
+    # $1: File/Folder to point to
+    # $2: New link
+    # $3: Description of file
+    # $4: Description of what we are doing
     # $5: What did we fail to do; will prompt user
     
     if ! create_link_from_to "$1" "$2" "$3" "$4"; then
         echo ">> Failed to $5" >&2
         if ! ignore; then
-            exit 1
+            return 1
         fi
     fi
+    return 0
 }
 export -f create_link_from_to_exit_on_fail
 
@@ -342,23 +346,81 @@ git_clone_and_submodule_init_update() {
     # $1: Git repo
     # Returns: Success on successfull clone
     # REPO_DIRECTORY: Directory of cloned repo
+    REPO="$1"
     REPO_DIRECTORY=""
     if ! require_package "git"; then
         return 1
     fi
-    if git clone "$1"; then
-        REPO_DIRECTORY=`basename "$1"`
-        if [ -d "$REPO_DIRECTORY" ]; then
-            cd "$REPO_DIRECTORY";
-            REPO_DIRECTORY=`pwd`
-            git submodule init && git submodule update
-            cd -
+    extract_url_filename "$REPO"
+    REPO_DIRECTORY="./$URL_FILENAME"
+    if [ -d "$REPO_DIRECTORY" ]; then
+        if [ -e "$REPO_DIRECTORY/.git/config" ]; then
+            if ! grep "$REPO" "$REPO_DIRECTORY/.git/config" &>/dev/null; then
+                if prompt "> The directory $REPO_DIRECTORY does not seem to be a clone of the repo, rename"; then
+                    rename_file "$REPO_DIRECTORY"
+                else
+                    echo ret?
+                    return 1
+                fi
+            else
+                if prompt "> Found a git clone of the repo at $REPO_DIRECTORY, update it"; then
+                    cd "$REPO_DIRECTORY"
+                    while true; do
+                        if ! git pull; then
+                            if ! prompt "> Try git pull again"; then
+                                return 1
+                            fi
+                        else
+                            break
+                        fi
+                    done
+                fi
+            fi
         fi
-    else
-        return 1
+    elif [ -e "$REPO_DIRECTORY" ]; then
+        if ! rename_file "$REPO_DIRECTORY"; then
+            return 1
+        fi
+    fi
+    if [ ! -d "$REPO_DIRECTORY" ]; then
+        # only git clone if the folder does not exist
+        while true; do
+            if git clone "$REPO"; then
+                REPO_DIRECTORY=`basename "$REPO"`
+                if [ -d "$REPO_DIRECTORY" ]; then
+                    cd "$REPO_DIRECTORY";
+                    REPO_DIRECTORY=`pwd`
+                    git submodule init && git submodule update
+                    cd -
+                fi
+                return 0
+            else
+                if ! prompt "> Try git clone $REPO again"; then
+                    return 1
+                fi
+            fi
+        done
     fi
 }
 export -f git_clone_and_submodule_init_update
+
+git_clone_prompt() {
+    # $1: Git repo
+    # $2: Description (Optional)
+    # Returns: Success on successfull clone
+    # REPO_DIRECTORY: Directory of cloned repo
+    REPO="$1"
+    DESCRIPTION="$2"
+    if [ -z "$DESCRIPTION" ]; then
+        DESCRIPTION="git clone $REPO"
+    fi
+    if prompt "> $DESCRIPTION"; then
+        git_clone_and_submodule_init_update "$REPO"
+        return $?
+    fi
+    return 1
+}
+export -f git_clone_prompt
 
 POSTINSTALL="$DIR/postinstall.sh"
 export POSTINSTALL
