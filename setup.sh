@@ -83,23 +83,11 @@ resolve_symlink () {
     # $RESOLVED_SYMLINK: Resolved symlink
 
     FILE="$1"
-    #check if it does not exist
-    if [ ! -e "$FILE" ]; then
-	FILE=`which "$FILE"`
-	if [ ! -e "$FILE" ]; then
-	    echo "File does not appear to exist"
-	    exit 1
-	fi
-    fi
     #check if it is a symlink
     if [ -h "$FILE" ]; then
 	lnk=`readlink "$FILE"`
 	resolve_symlink "$lnk"
-        retval="$?"
-        if [ "$?" == 0 ]; then
-            RESOLVED_SYMLINK="$FILE"
-        fi
-        return "$retval"
+        return "$?"
     else
         RESOLVED_SYMLINK="$FILE"
     fi

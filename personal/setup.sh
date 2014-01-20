@@ -164,6 +164,7 @@ install "scrot" "scrot"
 install "vlc" "vlc"
 install "ubuntu-restricted-extras"
 install "gnome-system-tools"
+install "xchm"
 if available "skype"; then
     install "skype" "Skype"
 else
