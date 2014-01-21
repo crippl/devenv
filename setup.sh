@@ -479,12 +479,16 @@ installed() {
 
     # Checks apt-cache policy for Installed: (none)
     if available "$1"; then
-        START=$(date +%s)
+        if [ $APT_CACHE_SLOW == false ]; then
+            START=$(date +%s)
+        fi
         tmp=`apt-cache policy "$1" | grep Installed: | grep "none"`
-        END=$(date +%s)
-        DIFF=$(( $END - $START ))
-        if [ "$DIFF" -ge 2 ]; then # running slow... should run apt-get autoclean
-            APT_CACHE_SLOW=true
+        if [ $APT_CACHE_SLOW == false ]; then
+            END=$(date +%s)
+            DIFF=$(( $END - $START ))
+            if [ "$DIFF" -ge 2 ]; then # running slow... should run apt-get autoclean
+                APT_CACHE_SLOW=true
+            fi
         fi
         return `[ -z "$tmp" ]`
     else
@@ -556,7 +560,7 @@ install() {
             # Description was not given, don't show all packages to install, just those that can be installed
             DESCRIPTION="$toinstall"
         fi
-        if prompt "> Install $DESCRIPTION"; then
+        if prompt "> Install $DESCRIPTION: $PACKAGES"; then
             if [ -n "$notavailable" ]; then
                 if ! prompt "> Notice: the following packages are not available \"$notavailable\"... continue"; then
                     return 1
