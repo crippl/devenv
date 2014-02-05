@@ -26,3 +26,4 @@ if [ -e "./setup_android_sdk.sh" ] && prompt "> Download and install Android SDK
 fi
 # libraries from http://stackoverflow.com/questions/14976353/android-emulator-is-not-starting-in-ubuntu
 install "libgles1-mesa-dev libgles2-mesa-dev libgles1-mesa libgles2-mesa libqt4-opengl glmark2 glmark2-es2 libgles1-mesa-dbg libgles2-mesa-dbg freeglut3 libhugs-opengl-bundled" "Android SDK Hardware emulation libraries"
+install "android-tools-adb"

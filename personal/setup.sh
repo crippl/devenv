@@ -220,3 +220,22 @@ else
     echo "> Installed Already: $SOUNDCLOUDDL_DESC"
 fi
 
+if ! installed "xbmc"; then
+    if prompt "> Install XBMC"; then
+        XBMC_REQUIRED_PACKAGES="python-software-properties pkg-config software-properties-common"
+        #todo: break these up into available calls
+        if require_package "$XBMC_REQUIRED_PACKAGES"; then
+            if ! available "xbmc"; then
+                while true; do
+                    if sudo add-apt-repository ppa:team-xbmc/ppa; then
+                        sudo apt-get update
+                        break
+                    elif ! prompt "> Try adding repository again"; then
+                        break
+                    fi
+                done
+            fi
+            install "xbmc"
+        fi
+    fi
+fi
