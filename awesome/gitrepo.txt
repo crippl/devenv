@@ -1,1 +1,1 @@
-https://github.com/crippl/awesome-config
+https://github.com/ripply/awesome-config
