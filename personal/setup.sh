@@ -239,3 +239,35 @@ if ! installed "xbmc"; then
         fi
     fi
 fi
+
+YOUTUBE_PACKAGE="youtube-to-mp3"
+YOUTUBE_DESC="Youtube to mp3 by mediahuman"
+if available "$YOUTUBE_PACKAGE"; then
+    install "$YOUTUBE_PACKAGE" "$YOUTUBE_DESC"
+elif prompt "> Install $YOUTUBE_DESC"; then
+    while true; do
+	echo "> Adding repository"
+	if sudo add-apt-repository 'http://www.mediahuman.com/packages/ubuntu'; then
+	    break
+	elif ! prompt "> Try adding repository again"; then
+	    break
+	fi
+    done
+    while true; do
+	echo "> Adding MediaHuman key"
+	if sudo apt-key adv --keyserver pgp.mit.edu --recv-keys D808832C7D19F1F3; then
+	    break
+	elif ! prompt "> Try adding key again"; then
+	    break
+	fi
+    done
+    while true; do
+	echo "> Updating apt-get"
+	if sudo apt-get update; then
+	    break
+	elif ! prompt "> Try apt-get update again"; then
+	    break
+	fi
+    done
+    install "$YOUTUBE_PACKAGE"
+fi
