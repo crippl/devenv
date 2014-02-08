@@ -79,6 +79,20 @@ if ask_user_where_to_extract_file_at "$DOWNLOADFILENAME" "$PACKAGE_NAME"; then
                 return 1
             fi
         else
+            BIN=`echo ~`/bin
+            if [ ! -e "$BIN" ]; then
+                mkdir "$BIN"
+            elif [ ! -d "$BIN" ]; then
+                echo "> $BIN seems to not be a directory, not creating symlink to eclipse"
+            fi
+            if [ -d "$BIN" ]; then
+                extract_filename "$DOWNLOADFILENAME"
+                if [ ! -e "$USERREQUESTED_FOLDER/$FILENAME/eclipse/eclipse" ]; then
+                    if create_link_from_to "$USERREQUESTED_FOLDER/$FILENAME/eclipse/eclipse" "$BIN/adt" "ADT Eclipse" "Should we create a symlink to ADT Eclipse in ~/bin"; then
+                        echo "> Created symlink to ADT Eclipse at $BIN/adt"
+                    fi
+                fi
+            fi
             echo "> Installed $PACKAGE_NAME"
             break
         fi

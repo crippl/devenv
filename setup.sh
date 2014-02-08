@@ -759,6 +759,17 @@ install_deb_file() {
 }
 export -f install_deb_file
 
+extract_filename() {
+    # Get the name of a file minus the file extension
+    # $1: File
+    # Returns: FILENAME
+    FILE="$1"
+    
+    FILENAME=$(basename "$FILE")
+    FILENAME="${FILENAME%.*}"
+}
+export -f extract_filename
+
 ####################################################
 #                End of functions                  #
 ####################################################
