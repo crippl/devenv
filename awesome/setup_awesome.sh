@@ -115,3 +115,9 @@ else
         exit 1
     fi
 fi
+AWESOMEPOSTINSTALL=`pwd`/setup_awesome_postinstall.sh
+if [ -e "$AWESOMEPOSTINSTALL" ]; then
+    post_install "$AWESOMEPOSTINSTALL"
+else
+    echo ">> Awesome Post installation script does not exist"
+fi

@@ -3,7 +3,7 @@
 #
 
 #no_targets__:
-.PHONY: all personal dev development editors awesome
+.PHONY: all personal dev development editors awesome post
 
 all: clear personal awesome development editors install
 
@@ -15,6 +15,9 @@ clean:
 
 clear:
 	@bash ./setup.sh clear
+
+post:
+	@bash ./setup.sh post
 
 personal:
 	@echo "> Setting up Personal software"

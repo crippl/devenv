@@ -27,6 +27,13 @@ export APT_CACHE_SLOW
 PROMPT_FORCE_ANSWER=""
 export PROMPT_FORCE_ANSWER
 
+info() {
+    # $1: Module to display
+    # $2: Message to display
+    echo "[$1] $2"
+}
+export -f info
+
 prompt() {
     # $1: Text to prompt to user
     # Returns: 0 on yes, 1 on no
@@ -770,6 +777,54 @@ extract_filename() {
 }
 export -f extract_filename
 
+prepend_file() {
+    # Prepend something to a file
+    # $1: File
+    # $2: Text to prepend
+    FILE="$1"
+    TEXT="$2"
+    if [ -e "$FILE" ]; then
+        echo "$TEXT"|cat - "$FILE" > /tmp/out && mv /tmp/out "$FILE"
+    else
+        echo "$TEXT" >> "$FILE"
+    fi
+}
+export -f prepend_file
+
+post_install() {
+    # Add a command to post installation
+    # $1: Command to run (Usually another script)
+    CMD="$1 || exit"
+    SHEBANG="#!/bin/bash"
+    if [ -e "$POSTINSTALL" ]; then
+        if already_in_file "$POSTINSTALL" "$CMD"; then
+            return 0
+        fi
+    fi
+    if ! already_in_file "$POSTINSTALL" "$SHEBANG"; then
+        prepend_file "$POSTINSTALL" "$SHEBANG"
+    fi
+    echo >> "$POSTINSTALL"
+    echo "$CMD" >> "$POSTINSTALL"
+}
+export -f post_install
+
+run_command_promp_user_if_fail() {
+    # Run a command and if it fails, prompt the user to run it again
+    # $1: Command to run
+    COMMAND="$1"
+    
+    while true; do
+        if $COMMAND; then
+            break
+        elif ! prompt ">> Try again"; then
+            return 1
+        fi
+    done
+    return 0
+}
+export -f run_command_promp_user_if_fail
+
 ####################################################
 #                End of functions                  #
 ####################################################
@@ -779,6 +834,23 @@ for i in `awk 'BEGIN { for( i=1; i<=50; i++ ) print i }'`; do
     ASTERISKS="$ASTERISKS*"
 done
 export ASTERISKS
+
+run_post_install() {
+    if [ -f "$POSTINSTALL" ]; then
+        echo "> Running post installation routines"
+        if bash "$POSTINSTALL"; then
+            echo "> Postinstall finished successfully, cleaning up"
+            rm -f "$POSTINSTALL"
+        else
+            echo "$ASTERISKS"
+            echo "> Postinstall failed, to rerun: "
+            echo "> make install"
+            echo "$ASTERISKS"
+        fi
+    else
+        echo "> No post install scripts detected"
+    fi
+}
 
 if [ -z "$1" ]; then
     # No options given, do default behaviour
@@ -797,25 +869,11 @@ elif [ "$1" == "install" ]; then
             echo "> sudo apt-get install \`cat $TOINSTALLFILE\`"
             echo "$ASTERISKS"
             exit $retval
-        else
-            if [ -f "$POSTINSTALL" ]; then
-                echo "> Running post installation routines"
-                if [ `bash "$POSTINSTALL"` ]; then
-                    echo "> Postinstall finished successfully, cleaning up"
-                    rm -f "$POSTINSTALL"
-                else
-                    echo "$ASTERISKS"
-                    echo "> Postinstall failed, to rerun: "
-                    echo "> bash $POSTINSTALL"
-                    echo "$ASTERISKS"
-                fi
-            else
-                echo "> No post install scripts detected"
-            fi
         fi
     else
         echo "> Nothing to install"
     fi
+    run_post_install
     if [ -e "$MISSINGPACKAGES" ]; then
         missing=`cat "$MISSINGPACKAGES"`
         if [ -n "$missing" ]; then
@@ -824,6 +882,8 @@ elif [ "$1" == "install" ]; then
             echo "> The list can be found at $MISSINGPACKAGES"
         fi
     fi
+elif [ "$1" == "post" ]; then
+    run_post_install
 elif [ "$1" == "clear" ]; then
     # Promp user to clear temp files we use
     clear_file "$TOINSTALLFILE" "To install"
