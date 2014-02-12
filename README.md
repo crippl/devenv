@@ -5,7 +5,7 @@ This will install about 3gb of software on a fresh Ubuntu installation if all so
 
 On a new installaion of Ubuntu don't forget to run apt-get update before running scripts
 
-### Installaion
+### Installation
 
 	sudo apt-get update
 	git clone https://github.com/ripply/devenv && cd devenv && make
