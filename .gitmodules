@@ -1,0 +1,3 @@
+[submodule "awesome/awesomegit/awesome-config"]
+	path = awesome/awesomegit/awesome-config
+	url = https://github.com/ripply/awesome-config
