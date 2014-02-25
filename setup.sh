@@ -58,6 +58,9 @@ export -f prompt
 
 DIRECTORY=""
 input_valid_directory() {
+    # $1: User prompt
+    # Returns: True if found a directory
+    #          DIRECTORY, path to directory
     while true; do
         read -p "$1 ?: " USER_DIRECTORY
         if [ -d "$USER_DIRECTORY" ]; then
@@ -72,6 +75,53 @@ input_valid_directory() {
 }
 export -f input_valid_directory
 export DIRECTORY
+
+EXECUTABLE=""
+input_valid_executable() {
+    # $1: User prompt
+    # Returns: True if found an executable file
+    #          EXECUTABLE, path to file
+    while true; do
+        read -p "$1 ?: " USER_EXECUTABLE
+        if [ -x "$USER_EXECUTABLE" ]; then
+            EXECUTABLE="$USER_EXECUTABLE"
+            return 0
+        else
+            if ! prompt "> $USER_EXECUTABLE is not runnable, input again"; then
+                return 1
+            fi
+        fi
+    done
+}
+export -f input_valid_executable
+export EXECUTABLE
+
+EXECUTABLE=""
+find_executable() {
+    # Finds an eclipse to run
+    # $1: Default executable to try
+    # $2: Package to install if not runnable
+    # Returns: True on success
+    #          EXECUTABLE, command to run
+
+    DEFAULT_COMMAND="$1"
+    PACKAGE="$2"
+    if runnable "$DEFAULT_COMMAND" ||
+        ([ -n "$PACKAGE" ] && require_package "$DEFAULT_COMMAND" && runnable "$DEFAULT_COMMAND"); then
+        # "eclipse" works fine
+        EXECUTABLE="$DEFAULT_COMMAND"
+    else
+        # Prompt user for path to eclipse
+        if input_valid_directory "> Cannot find path to $DEFAULT_COMMAND, where is it"; then
+            return 0
+        else
+            echo "> Couldn't find runnable $DEFAULT_COMMAND, giving up"
+            return 1
+        fi
+    fi
+}
+export -f find_executable
+export EXECUTABLE
 
 ignore() {
     # Prompts user to ignore an error
@@ -794,12 +844,16 @@ export -f prepend_file
 post_install() {
     # Add a command to post installation
     # $1: Command to run (Usually another script)
-    CMD="$1 || exit"
+    CMD="$1"
     SHEBANG="#!/bin/bash"
+    EXITONERROR="set -e"
     if [ -e "$POSTINSTALL" ]; then
         if already_in_file "$POSTINSTALL" "$CMD"; then
             return 0
         fi
+    fi
+    if ! already_in_file "$POSTINSTALL" "$EXITONERROR"; then
+        prepend_file "$POSTINSTALL" "$EXITONERROR"
     fi
     if ! already_in_file "$POSTINSTALL" "$SHEBANG"; then
         prepend_file "$POSTINSTALL" "$SHEBANG"
