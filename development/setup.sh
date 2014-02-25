@@ -57,6 +57,7 @@ if install "build-essential glibc-doc valgrind manpages-dev gdb cgdb autoconf au
             fi
         fi
     fi
+    install "tomcat7"
     install "libqtcore4 qdevelop qtcreator qt4-qtconfig libqt5webkit5-dev qt4-doc-html qtbase5-doc qttools5-doc-html qtwebkit5-doc-html qtdeclarative5-doc qtscript5-doc qtwebkit5-doc qttools5-doc" "QT development"
 fi
 install "sqlite3 libsqlite3-dev sqlite3-doc sqlitebrowser sqliteman sqliteman-doc" "sqlite3"
