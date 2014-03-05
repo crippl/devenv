@@ -15,7 +15,9 @@ On a new installaion of Ubuntu don't forget to run apt-get update before running
 	
 The scripts will prompt to install each piece of software that is reported as installable by apt-cache
 
-At the end of the script, all software will be installed with one big apt-get install command
+Some of the software will be downloaded directly via wget eg. the latest version of Android Dev kit, JDK1.6.
+
+At the end of the script, the remaining software will be installed with one big apt-get install command.
 
 ### Included Software
 
