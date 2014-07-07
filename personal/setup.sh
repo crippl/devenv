@@ -271,3 +271,25 @@ elif prompt "> Install $YOUTUBE_DESC"; then
     done
     install "$YOUTUBE_PACKAGE"
 fi
+
+if ! installed "nightingale"; then
+    if ! available "nightingale"; then
+        if prompt "Install Nightingale Music player"; then
+            while true; do
+                if sudo apt-add-repository; then
+                    echo ">> Updating repos..."
+                    sudo apt-get update
+                    install "nightingale" "Nightingale Music player"
+                    break
+                elif ! prompt "Try again"; then
+                    break
+                fi
+            done
+        fi
+    else
+        install "nightingale" "Nightingale Music Player"
+    fi
+else
+    # Show already installed message
+    install "nightingale" "Nightingale Music Player"
+fi
